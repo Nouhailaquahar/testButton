@@ -1,1 +1,30 @@
 
+pipeline {
+    agent any
+
+    stages {
+        stage('Execute Pipelines') {
+            steps {
+                script {
+                    def pipelineNames = ['pipeline1', 'pipeline2', 'pipelineErreur', 'testbouton', 'test2', 'pipelineErreur2']
+                    def failedPipelines = []
+
+                    pipelineNames.each { pipelineName ->
+                        echo "***********Exécution du pipeline: $pipelineName************"
+                        try {
+                            def result = build job: pipelineName, wait: true
+                            echo "Le pipeline $pipelineName a réussi."
+                        } catch (Exception e) {
+                            failedPipelines.add(pipelineName)
+                            echo "Le pipeline $pipelineName a échoué. Vérifiez les détails de l'échec."
+                        }
+                    }
+
+                    if (failedPipelines) {
+                        echo "Les pipelines suivants ont échoué : ${failedPipelines.join(', ')}"
+                    }
+                }
+            }
+        }
+    }
+}
